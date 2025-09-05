@@ -1,0 +1,82 @@
+[gd_scene load_steps=13 format=3 uid="uid://d016gugduyuff"]
+
+[ext_resource type="Script" uid="uid://cs7iyjkbok3fs" path="res://Golfball.gd" id="1_h4421"]
+[ext_resource type="Script" uid="uid://cfrjgk6kywr2m" path="res://BallAim.gd" id="1_vqmf3"]
+[ext_resource type="Script" uid="uid://41bydl1el1sq" path="res://ClubInteraction.gd" id="2_4gbcn"]
+[ext_resource type="ArrayMesh" uid="uid://bp70gs8xdms4j" path="res://Models/StandardBall.obj" id="2_vqmf3"]
+[ext_resource type="Script" uid="uid://b24ko8k7y3woa" path="res://camera_rig.gd" id="4_ralax"]
+[ext_resource type="Script" uid="uid://byc82yqxf5tad" path="res://GolfClubs.gd" id="5_xs7vr"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_h4421"]
+friction = 0.33
+bounce = 0.5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_csest"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_h4421"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_h4421"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4gbcn"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_h4421"]
+
+[node name="Golfball" type="Node3D"]
+script = ExtResource("1_vqmf3")
+
+[node name="Ball" type="RigidBody3D" parent="." groups=["Ball"]]
+mass = 0.046
+physics_material_override = SubResource("PhysicsMaterial_h4421")
+continuous_cd = true
+script = ExtResource("1_h4421")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball"]
+transform = Transform3D(0.07, 0, 0, 0, 0.07, 0, 0, 0, 0.07, 0, 0, 0)
+shape = SubResource("SphereShape3D_csest")
+
+[node name="Area3D" type="Area3D" parent="Ball"]
+transform = Transform3D(0.045, 0, 0, 0, 0.045, 0, 0, 0, 0.045, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball/Area3D"]
+transform = Transform3D(2.1, 0, 0, 0, 2.1, 0, 0, 0, 2.1, 0, 0, 0)
+shape = SubResource("SphereShape3D_h4421")
+debug_color = Color(0.158803, 0.635823, 0.313217, 0.42)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ball"]
+mesh = ExtResource("2_vqmf3")
+
+[node name="CameraRig" type="Marker3D" parent="Ball"]
+script = ExtResource("4_ralax")
+
+[node name="Camera3D" type="Camera3D" parent="Ball/CameraRig"]
+transform = Transform3D(-1, 1.45794e-08, -8.61985e-08, 0, 0.985996, 0.166769, 8.74228e-08, 0.166769, -0.985996, 0, 0.415, -1.731)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="Ball/CameraRig"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 2.43943, 0)
+
+[node name="ClubSim" type="CharacterBody3D" parent="."]
+transform = Transform3D(0.525, 0, 0, 0, 0.525, 0, 0, 0, 0.525, 0, 0, -0.227769)
+script = ExtResource("2_4gbcn")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ClubSim"]
+transform = Transform3D(0.12, 0, 0, 0, 0.12, 0, 0, 0, 0.12, 0, 0, 0)
+shape = SubResource("BoxShape3D_h4421")
+
+[node name="Area3D" type="Area3D" parent="ClubSim"]
+transform = Transform3D(0.185, 0, 0, 0, 0.185, 0, 0, 0, 0.185, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ClubSim/Area3D"]
+transform = Transform3D(1.12, 0, 0, 0, 1.12, 0, 0, 0, 1.12, 0, 0, 0)
+shape = SubResource("BoxShape3D_4gbcn")
+debug_color = Color(0.189354, 0.63157, 0.339711, 0.42)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="ClubSim"]
+transform = Transform3D(0.185, 0, 0, 0, 0.185, 0, 0, 0, 0.185, 0, 0, 0)
+mesh = SubResource("BoxMesh_h4421")
+
+[node name="Clubs" type="Node3D" parent="."]
+script = ExtResource("5_xs7vr")
+
+[connection signal="area_entered" from="Ball/Area3D" to="Ball" method="_on_area_3d_area_entered"]
+[connection signal="area_entered" from="ClubSim/Area3D" to="ClubSim" method="_on_area_3d_area_entered"]
+[connection signal="Club_Used" from="Clubs" to="Ball" method="_on_clubs_club_used"]
